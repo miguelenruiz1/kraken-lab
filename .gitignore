@@ -6,6 +6,6 @@ dist
 .env
 .env.local
 .kraken
-reports/
+examples/*/reports/
 *.tsbuildinfo
 *.log
