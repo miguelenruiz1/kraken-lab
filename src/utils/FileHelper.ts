@@ -1,6 +1,6 @@
 import fs from "fs";
 import fse from "fs-extra";
-import glob from "glob";
+import { globSync } from "glob";
 import path from "path";
 import * as Constants from '../utils/Constants';
 
@@ -21,14 +21,9 @@ export class FileHelper {
   }
 
   deleteFilesWithGlobPattern(globPattern: string) {
-    glob(globPattern, {}, (err: any, files: any) => {
-      if(err) {
-        throw err;
-      }
-      
-      files.forEach((filePath: any) => {
-        this.deleteFileInPath(filePath);
-      });
+    const files = globSync(globPattern);
+    files.forEach((filePath: string) => {
+      this.deleteFileInPath(filePath);
     });
   }
 
