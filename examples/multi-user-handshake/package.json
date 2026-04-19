@@ -1,0 +1,12 @@
+{
+  "name": "multi-user-handshake-example",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Kraken multi-user demo — two browsers coordinate via the file-based signaling protocol",
+  "scripts": {
+    "test": "kraken-node run"
+  },
+  "dependencies": {
+    "kraken-node": "file:../.."
+  }
+}

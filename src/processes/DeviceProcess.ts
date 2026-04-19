@@ -4,6 +4,7 @@ import { DeviceProcessInterface } from '../interfaces/DeviceProcessInterface';
 import { spawn } from "child_process";
 import { FileHelper } from '../utils/FileHelper';
 import * as Constants from '../utils/Constants';
+import * as path from 'path';
 
 export abstract class DeviceProcess implements DeviceProcessInterface {
   id: Number;
@@ -21,7 +22,8 @@ export abstract class DeviceProcess implements DeviceProcessInterface {
   protected async runWithArgs(args: string[]) {
     const cucumberProcess = spawn(
       'node', args, {
-        stdio: 'inherit'
+        stdio: 'inherit',
+        env: process.env
       }
     );
     cucumberProcess.on('exit', function (err) {
@@ -37,7 +39,7 @@ export abstract class DeviceProcess implements DeviceProcessInterface {
       `${__dirname}/../../bin/cucumber`,
       '-f', 'pretty',
       '-f', `json:${Constants.REPORT_PATH}/${this.testScenario.executionId}/${this.device.id}/${Constants.FILE_REPORT_NAME}`,
-      `${this.testScenario.featureFile.filePath}`, 
+      this.testScenario.featureFile.filePath,
       '--tags', `@user${this.id}`,
       '--world-parameters', this.worldParams(),
       '--require', FileHelper.instance().pathToAbsolutePath(`${__dirname}/../steps/both.js`)
@@ -112,18 +114,18 @@ export abstract class DeviceProcess implements DeviceProcessInterface {
     return directoryContent.trim().split('\n');
   }
 
-  static registeredProcessIds(): Number[] {
+  static registeredProcessIds(): number[] {
     let directory = DeviceProcess.directory();
 
     return directory.map((entry: string) => {
       let entryParts: string[] = entry.split(Constants.SEPARATOR);
       return Number(entryParts[0]);
-    }).filter((id: Number) => {
-      return id != undefined && id != null && id != NaN;
+    }).filter((id: number) => {
+      return !Number.isNaN(id);
     });
   }
 
-  static processesInState(state: Number): Number[] {
+  static processesInState(state: number): number[] {
     let filePath: string = Constants.PROCESS_STATE_FILE_PATH[`${state}`];
     if (!FileHelper.instance().pathExists(filePath)) { return []; }
 
@@ -132,8 +134,8 @@ export abstract class DeviceProcess implements DeviceProcessInterface {
 
     return stateContent.trim().split('\n').map((entry: string) => {
       return Number(entry);
-    }).filter((id: Number) => {
-      return id != undefined && id != null && id != NaN;
+    }).filter((id: number) => {
+      return !Number.isNaN(id);
     });
   }
 
