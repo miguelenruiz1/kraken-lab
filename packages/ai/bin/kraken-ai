@@ -1,0 +1,83 @@
+#!/usr/bin/env node
+/* eslint-disable @typescript-eslint/no-var-requires */
+const fs = require('node:fs');
+const path = require('node:path');
+
+try { require('dotenv').config(); } catch {}
+
+const { fromPrompt, generateWithSteps } = require(path.join(__dirname, '..', 'dist', 'index'));
+
+function printUsageAndExit(code) {
+  const usage = [
+    'kraken-ai — AI-assisted Gherkin generation for Kraken',
+    '',
+    'Usage:',
+    '  kraken-ai generate --prompt "Descripción en español" [--output archivo.feature] [--model MODEL_ID] [--with-steps]',
+    '',
+    'Flags:',
+    '  --prompt TEXT       Natural-language description (required)',
+    '  --output PATH       File path for the .feature (optional; defaults to stdout)',
+    '  --model ID          Override default Claude model',
+    '  --with-steps        Also generate WebdriverIO step definitions (output PATH.steps.js)',
+    '',
+    'Environment:',
+    '  ANTHROPIC_API_KEY (required; can live in .env at cwd)',
+  ].join('\n');
+  process.stdout.write(usage + '\n');
+  process.exit(code);
+}
+
+const args = process.argv.slice(2);
+if (args.length === 0 || args[0] === '--help' || args[0] === '-h') printUsageAndExit(0);
+if (args[0] !== 'generate') {
+  process.stderr.write(`Unknown command: ${args[0]}\n`);
+  printUsageAndExit(1);
+}
+
+let prompt, output, model, withSteps = false;
+for (let i = 1; i < args.length; i++) {
+  const a = args[i];
+  if (a === '--prompt') prompt = args[++i];
+  else if (a === '--output') output = args[++i];
+  else if (a === '--model') model = args[++i];
+  else if (a === '--with-steps') withSteps = true;
+  else {
+    process.stderr.write(`Unknown option: ${a}\n`);
+    printUsageAndExit(1);
+  }
+}
+
+if (!prompt) {
+  process.stderr.write('--prompt is required\n');
+  printUsageAndExit(1);
+}
+
+(async () => {
+  try {
+    if (withSteps) {
+      const { feature, stepDefinitions, model: usedModel } = await generateWithSteps(prompt, { model });
+      if (output) {
+        fs.writeFileSync(output, feature + '\n');
+        const stepsPath = output + '.steps.js';
+        fs.writeFileSync(stepsPath, stepDefinitions + '\n');
+        process.stderr.write(`Generated with ${usedModel}.\n  Feature: ${output}\n  Steps:   ${stepsPath}\n`);
+      } else {
+        process.stdout.write('# ===== .feature =====\n');
+        process.stdout.write(feature + '\n\n');
+        process.stdout.write('# ===== step definitions (WebdriverIO) =====\n');
+        process.stdout.write(stepDefinitions + '\n');
+      }
+    } else {
+      const { feature, model: usedModel } = await fromPrompt(prompt, { model });
+      if (output) {
+        fs.writeFileSync(output, feature + '\n');
+        process.stderr.write(`Generated with ${usedModel}. Written to ${output}\n`);
+      } else {
+        process.stdout.write(feature + '\n');
+      }
+    }
+  } catch (err) {
+    process.stderr.write((err && err.message ? err.message : String(err)) + '\n');
+    process.exit(1);
+  }
+})();

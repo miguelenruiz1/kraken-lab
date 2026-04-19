@@ -1,3 +1,11 @@
 node_modules
 example
 lib
+dist
+.next
+.env
+.env.local
+.kraken
+examples/*/reports/
+*.tsbuildinfo
+*.log

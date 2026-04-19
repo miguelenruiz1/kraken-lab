@@ -1,0 +1,33 @@
+{
+  "name": "@kraken-lab/ai",
+  "version": "0.1.0",
+  "description": "AI-assisted Gherkin generation for Kraken — writes feature files in Kraken's native dialect (userN tags, property placeholders, faker tokens) and WebdriverIO-style step definitions ready to drop into a kraken-node project",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "kraken-ai": "./bin/kraken-ai"
+  },
+  "files": [
+    "dist",
+    "bin"
+  ],
+  "scripts": {
+    "build": "tsc -p .",
+    "clean": "rm -rf dist"
+  },
+  "license": "MIT",
+  "author": "Miguel Ruiz",
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.68.0",
+    "@cucumber/gherkin": "^24.1.0",
+    "@cucumber/messages": "^22.0.0",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0",
+    "@types/node": "^22.10.0"
+  }
+}

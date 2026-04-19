@@ -1,4 +1,4 @@
-import faker from '@faker-js/faker';
+import { faker } from '@faker-js/faker';
 import * as Constants from '../utils/Constants';
 import { FileHelper } from './FileHelper';
 
@@ -61,11 +61,11 @@ export class KrakenFaker {
   }
 
   private generateName(): string {
-    return faker.name.firstName();
+    return faker.person.firstName();
   }
 
   private generateNumber(): string {
-    return `${faker.datatype.number()}`;
+    return `${faker.number.int()}`;
   }
 
   private generateEmail(): string {
@@ -73,17 +73,17 @@ export class KrakenFaker {
   }
 
   private generateString(): string {
-    return faker.datatype.string();
+    return faker.string.sample();
   }
 
   private generateDate(): string {
-    return faker.datatype.datetime({}).toDateString();
+    return faker.date.recent().toDateString();
   }
 
   private generateUrl(): string {
     return faker.internet.url();
   }
- 
+
   static stringIsAFaker(string: String): boolean {
     return string.startsWith("$");
   }

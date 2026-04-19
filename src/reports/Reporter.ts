@@ -147,7 +147,22 @@ export class Reporter {
 
     private generateDeviceReport(baseData: any, device: Device, userId: number) {
         let cucumberFile = `${Constants.REPORT_PATH}/${this.testScenario.executionId}/${device.id}/${Constants.FILE_REPORT_NAME}`;
-        let features = JSON.parse(FileHelper.instance().contentOfFile(cucumberFile));
+        let features: any[] = [];
+        if (FileHelper.instance().pathExists(cucumberFile)) {
+            const rawContent = FileHelper.instance().contentOfFile(cucumberFile);
+            if (rawContent && rawContent.trim().length > 0) {
+                try {
+                    features = JSON.parse(rawContent);
+                } catch (err) {
+                    console.log(`Warning: could not parse cucumber JSON at ${cucumberFile}: ${err instanceof Error ? err.message : err}`);
+                    features = [];
+                }
+            } else {
+                console.log(`Warning: cucumber produced an empty report at ${cucumberFile}; HTML report will be minimal.`);
+            }
+        } else {
+            console.log(`Warning: cucumber report missing at ${cucumberFile}; HTML report will be minimal.`);
+        }
         let data = {
             apk_path: null,
             features: features,
@@ -210,7 +225,16 @@ export class Reporter {
             }
 
             let fileContent = FileHelper.instance().contentOfFile(deviceReportFilePath);
-            devicesReport[device.user] = JSON.parse(fileContent);
+            if (!fileContent || !fileContent.trim()) {
+                devicesReport[device.user] = [];
+                return;
+            }
+            try {
+                devicesReport[device.user] = JSON.parse(fileContent);
+            } catch {
+                devicesReport[device.user] = [];
+                return;
+            }
             devicesReport[device.user].forEach((entry: any) => {
                 if (entry.device_model == null || entry.device_model == undefined) {
                     entry.device_model = device.model;
