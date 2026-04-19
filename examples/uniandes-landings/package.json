@@ -1,0 +1,13 @@
+{
+  "name": "uniandes-landings-example",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Kraken case study — validates Universidad de los Andes program landing pages (SEO, structure, tabs, form negative, form positive E2E)",
+  "scripts": {
+    "test": "kraken-node run"
+  },
+  "dependencies": {
+    "kraken-node": "file:../..",
+    "chai": "^4.5.0"
+  }
+}

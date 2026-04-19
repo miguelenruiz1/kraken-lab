@@ -9,11 +9,11 @@ export abstract class SignalingClient {
         this.id = id || Device.generateRandomId();
     }
 
-    async readSignal(signal: string, timeout: Number = Constants.DEFAULT_TIMEOUT_MILLISECONDS) {
+    async readSignal(signal: string, timeout: number = Constants.DEFAULT_TIMEOUT_MILLISECONDS) {
         return new Promise(resolve => this.waitForSignalOrTimeout(signal, timeout, Date.now(), resolve));
     }
 
-    private waitForSignalOrTimeout(signal: string, timeout: Number, startTime: any, resolve: any) {
+    private waitForSignalOrTimeout(signal: string, timeout: number, startTime: any, resolve: any) {
         if (signal === this.inboxLastSignal()) {
           resolve(signal);
         } else if (

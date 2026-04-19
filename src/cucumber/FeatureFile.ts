@@ -1,8 +1,8 @@
 import { TestScenario } from '../TestScenario';
 import { FeatureScenario } from './FeatureScenario';
 const fs = require("fs");
-var Gherkin = require("@cucumber/gherkin");
-var Messages = require("@cucumber/messages");
+const Gherkin = require("@cucumber/gherkin");
+const Messages = require("@cucumber/messages");
 
 export class FeatureFile {
   filePath: string;
@@ -125,9 +125,12 @@ export class FeatureFile {
   private gherkinDocument(): any {
     const uuidFn: any = Messages.IdGenerator.uuid();
     const builder = new Gherkin.AstBuilder(uuidFn);
-    const matcher: any = new Gherkin.TokenMatcher();
+    // Gherkin 24 exports TokenMatcher; 25+ renamed it to GherkinClassicTokenMatcher.
+    // Support both so the code compiles whichever version cucumber pulls in.
+    const MatcherClass: any = Gherkin.TokenMatcher || Gherkin.GherkinClassicTokenMatcher;
+    const matcher: any = new MatcherClass();
     const parser: any = new Gherkin.Parser(builder, matcher);
-    const content: string = fs.readFileSync(this.filePath,'utf8');
+    const content: string = fs.readFileSync(this.filePath, 'utf8');
     return parser.parse(content);
   }
 }

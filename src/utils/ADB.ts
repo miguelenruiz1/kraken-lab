@@ -15,7 +15,13 @@ export class ADB {
 
   connectedDevices(): AndroidDevice[] {
     let devices: AndroidDevice[] = [];
-    const adbDevices: string = execSync('adb devices -l').toString();
+    let adbDevices: string;
+    try {
+      adbDevices = execSync('adb devices -l', { stdio: ['pipe', 'pipe', 'pipe'] }).toString();
+    } catch {
+      // adb is not installed or not on PATH — treat as no connected devices.
+      return devices;
+    }
     adbDevices.split('\n').forEach((line: string) => {
       const id: any = this.extractDeviceIdFromLine(line);
       const model: any = this.extractDeviceModelFromLine(line);
